@@ -9,6 +9,7 @@ from detectron2 import model_zoo
 from detectron2.utils.visualizer import Visualizer
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
+import torch
 
 app = Flask(__name__)
 app.secret_key = 'app_secret'
@@ -40,7 +41,22 @@ def newsFeed():
 
     outputs = predictor(image)
 
-    return {'foundPods': str(len(outputs.get("instances")))}
+    seedsInSoy=0
+
+    masks = outputs['instances'].pred_masks
+    soySizes = (torch.sum(torch.flatten(masks, start_dim=1),dim=1))
+
+    for seed in (soySizes.detach().cpu().numpy()):
+        if seed < 50:
+          seedsInSoy = seedsInSoy + 1
+        if seed > 50 and seed < 100:
+          seedsInSoy = seedsInSoy + 2
+        if seed > 100 and seed < 150:
+          seedsInSoy = seedsInSoy + 3
+        if seed > 150:
+          seedsInSoy = seedsInSoy + 4
+
+    return {'foundPods': str(len(outputs.get("instances"))), "seedsInSoy": str(seedsInSoy)}
 
 
 if __name__ == '__main__':
