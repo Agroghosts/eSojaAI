@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from waitress import serve
 import re
 import numpy as np
+import os
 
 import detectron2
 import os, cv2
@@ -17,6 +18,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:root@localhost:5433/postgres"
 
 cfg = get_cfg()
+cfg.MODEL.DEVICE='cpu'
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
 cfg.DATASETS.TRAIN = ("pod_train",)
 cfg.DATASETS.TEST = ()
